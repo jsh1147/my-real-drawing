@@ -4,6 +4,7 @@ import numpy as np
 import globals as g
 import recognize as r
 import transform as t
+import draw as d
 
 
 def main():
@@ -20,6 +21,7 @@ def main():
         # GUI 구성
         cam_image = cv2.flip(cam_image, 1)
         r.recognize_hand(cam_image)
+        d.draw_gui(cam_image)
         result_image = cv2.hconcat([cam_image, g.post_image])
         cv2.imshow('My Real Drawing', result_image)
 
@@ -27,6 +29,8 @@ def main():
         action = cv2.waitKey(1)
         if action != -1:
             if action == ord('f'):
+                d.draw_dot()
+            elif action == ord('g'):
                 t.draw_post_image()
             elif action == ord('q'):
                 break
