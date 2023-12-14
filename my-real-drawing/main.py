@@ -28,12 +28,12 @@ def main():
         # 액션 반응
         action = cv2.waitKey(1)
         if action != -1:
-            if action == ord('f'):
-                d.draw_dot()
-            elif action == ord('g'):
+            if action == ord('g'):
                 t.draw_post_image()
             elif action == ord('q'):
                 break
+        if g.hand_state == 'pointing':
+            d.draw_dot()
         if cv2.getWindowProperty('My Real Drawing', cv2.WND_PROP_VISIBLE) < 1:
             break
 

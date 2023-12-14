@@ -26,8 +26,10 @@ def draw_masked(base_img, added_img, x, y):
 
 
 def draw_dot():
-    dot = np.full((4, 4, len(g.color)), g.color, np.uint8)
-    g.pre_image[g.hand_y-2:g.hand_y+2, g.hand_x-2:g.hand_x+2] = dot
+    if g.prev_state == 'pointing':
+        cv2.line(g.pre_image, (g.prev_x, g.prev_y), (g.hand_x, g.hand_y), g.color, 8)
+    else:
+        cv2.circle(g.pre_image, (g.hand_x+4, g.hand_y+4), 4, g.color, -1)
 
 
 def draw_pre_image(img):
