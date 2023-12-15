@@ -13,6 +13,6 @@ def initialize(cam):
     pre_image = np.zeros((cam_h, cam_w, 4), np.uint8)
     post_image = np.zeros((cam_h, cam_w, 3), np.uint8)
     color = (255, 255, 255, 255)
-    hand_state = prev_state = 'palm'
+    hand_state = prev_state = 'move'
     hand_x = prev_x = int(cam_w / 2)
     hand_y = prev_y = int(cam_h / 2)

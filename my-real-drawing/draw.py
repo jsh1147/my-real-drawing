@@ -26,7 +26,7 @@ def draw_masked(base_img, added_img, x, y):
 
 
 def draw_dot():
-    if g.prev_state == 'pointing':
+    if g.prev_state == 'draw':
         cv2.line(g.pre_image, (g.prev_x, g.prev_y), (g.hand_x, g.hand_y), g.color, 8)
     else:
         cv2.circle(g.pre_image, (g.hand_x+4, g.hand_y+4), 4, g.color, -1)
@@ -37,6 +37,7 @@ def draw_pre_image(img):
 
 
 def draw_button(img):
+    # 색상 버튼, 지우개 버튼, 초기화 버튼, 변환 버튼, 종료 버튼
     button = np.zeros((64, 256, 3), np.uint8)
     cv2.rectangle(button, (00, 00), (256, 64), (255, 255, 255), 4)
     draw_non_masked(img, button, 16, 16)

@@ -25,15 +25,14 @@ def main():
         result_image = cv2.hconcat([cam_image, g.post_image])
         cv2.imshow('My Real Drawing', result_image)
 
-        # 액션 반응
-        action = cv2.waitKey(1)
-        if action != -1:
-            if action == ord('g'):
-                t.draw_post_image()
-            elif action == ord('q'):
-                break
-        if g.hand_state == 'pointing':
+        # 손동작 대응
+        if g.hand_state == 'draw':
             d.draw_dot()
+        if g.prev_state == 'move' and g.hand_state == 'click':
+            # 클릭이 발생한 손의 위치의 버튼을 동작
+            t.draw_post_image()
+
+        cv2.waitKey(1)
         if cv2.getWindowProperty('My Real Drawing', cv2.WND_PROP_VISIBLE) < 1:
             break
 
