@@ -20,7 +20,11 @@ def recognize_hand(cam_image):
             finger_4 = False
             finger_5 = False
 
-            if hand_landmarks.landmark[4].x < hand_landmarks.landmark[5].x:
+            dist_x = hand_landmarks.landmark[4].x - hand_landmarks.landmark[13].x
+            dist_y = hand_landmarks.landmark[4].y - hand_landmarks.landmark[13].y
+
+            if hand_landmarks.landmark[4].x < hand_landmarks.landmark[8].x or \
+                    (dist_x * dist_x) + (dist_y * dist_y) > 0.01:
                 finger_1 = True
             if hand_landmarks.landmark[8].y < hand_landmarks.landmark[6].y:
                 finger_2 = True
@@ -37,7 +41,8 @@ def recognize_hand(cam_image):
             # 손 상태 갱신
             if finger_1 and finger_2 and finger_3 and finger_4 and finger_5:
                 g.hand_state = c.State().MOVE
-            elif finger_2 and not finger_3 and not finger_4 and not finger_5:
+            elif not finger_1 and finger_2 and not finger_3 and \
+                    not finger_4 and not finger_5:
                 g.hand_state = c.State().DRAW
             elif not finger_1 and not finger_2 and not finger_3 and \
                     not finger_4 and not finger_5:
