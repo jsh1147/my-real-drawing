@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+import constants as c
 import globals as g
 
 
@@ -26,7 +27,7 @@ def draw_masked(base_img, added_img, x, y):
 
 
 def draw_dot():
-    if g.prev_state == 'draw':
+    if g.prev_state == c.State().DRAW:
         cv2.line(g.pre_image, (g.prev_x, g.prev_y), (g.hand_x, g.hand_y), g.color, 8)
     else:
         cv2.circle(g.pre_image, (g.hand_x+4, g.hand_y+4), 4, g.color, -1)

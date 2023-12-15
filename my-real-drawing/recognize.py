@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 
+import constants as c
 import globals as g
 
 mp_hands = mp.solutions.hands
@@ -35,21 +36,20 @@ def recognize_hand(cam_image):
 
             # 손 상태 갱신
             if finger_1 and finger_2 and finger_3 and finger_4 and finger_5:
-                g.hand_state = 'move'
-            elif finger_2 and not finger_3 and not finger_4 and not finger_5 and \
-                    g.hand_state != 'click':
-                g.hand_state = 'draw'
+                g.hand_state = c.State().MOVE
+            elif finger_2 and not finger_3 and not finger_4 and not finger_5:
+                g.hand_state = c.State().DRAW
             elif not finger_1 and not finger_2 and not finger_3 and \
                     not finger_4 and not finger_5:
-                g.hand_state = 'click'
+                g.hand_state = c.State().CLICK
 
             # 손 위치 갱신
-            if g.hand_state == 'draw':
+            if g.hand_state == c.State().DRAW:
                 g.hand_x = int(hand_landmarks.landmark[8].x * g.cam_w)
                 g.hand_y = int(hand_landmarks.landmark[8].y * g.cam_h)
             else:
-                g.hand_x = int(hand_landmarks.landmark[9].x * g.cam_w) - 48
-                g.hand_y = int(hand_landmarks.landmark[9].y * g.cam_h) - 48
+                g.hand_x = int(hand_landmarks.landmark[9].x * g.cam_w) - c.Pointer().SIZE // 2
+                g.hand_y = int(hand_landmarks.landmark[9].y * g.cam_h) - c.Pointer().SIZE // 2
 
-            g.hand_x = max(0, min(g.hand_x, g.cam_w - 96))
-            g.hand_y = max(0, min(g.hand_y, g.cam_h - 96))
+            g.hand_x = max(0, min(g.hand_x, g.cam_w - c.Pointer().SIZE))
+            g.hand_y = max(0, min(g.hand_y, g.cam_h - c.Pointer().SIZE))
