@@ -21,6 +21,7 @@ class Button:
     @property
     def ETC_GAP(self): return 32
 
+
 class Pointer:
     @property
     def SIZE(self): return 64
@@ -33,6 +34,11 @@ class Project:
     def SAVE_PRE_URL(self): return './My Drawing.png'
     @property
     def SAVE_POST_URL(self): return './My Real Drawing.png'
+    @property
+    def TRANS_PRE_URL(self): return './temp_pre.png'
+    @property
+    def TRANS_POST_URL(self): return './temp_post.png'
+
 
 class State:
     @property
