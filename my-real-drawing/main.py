@@ -8,6 +8,33 @@ import recognize as r
 import transform as t
 
 
+def event_handler():
+    cb = c.Button()
+    etc_x = g.cam_w - (cb.ETC_WIDTH + cb.ETC_GAP)
+    pointer_x = g.hand_x + c.Pointer().SIZE // 2
+    pointer_y = g.hand_y + c.Pointer().SIZE // 2
+
+    # 색상 버튼
+    if etc_x - (cb.COLOR_WIDTH + cb.COLOR_GAP) <= pointer_x <= etc_x - cb.COLOR_GAP:
+        g.color = cb.COLOR_VALUE[(pointer_y - cb.ETC_GAP) // (cb.COLOR_HEIGHT + cb.COLOR_GAP)] + (255,)
+
+    # 기타 버튼(지우개, 초기화, 변환, 저장, 종료)
+    elif etc_x <= pointer_x <= etc_x + cb.ETC_WIDTH:
+        target = (pointer_y - cb.ETC_GAP) // (cb.ETC_HEIGHT + cb.ETC_GAP)
+        if target == 0:  # 지우개
+            g.color = (0, 0, 0) + (0,)
+        elif target == 1:  # 초기화
+            g.pre_image = np.zeros((g.cam_h, g.cam_w, 4), np.uint8)
+        elif target == 2:  # 변환
+            t.draw_post_image()
+        elif target == 3:  # 저장
+            cv2.imwrite('./My_Drawing.png', g.pre_image)
+            cv2.imwrite('./My_Real_Drawing.png', g.post_image)
+        elif target == 4:  # 종료
+            return True
+    return False
+
+
 def main():
     # 초기 작업
     cam = cv2.VideoCapture(0)
@@ -30,8 +57,9 @@ def main():
         if g.hand_state == c.State().DRAW:
             d.draw_dot()
         if g.prev_state == c.State().MOVE and g.hand_state == c.State().CLICK:
-            # 클릭이 발생한 손의 위치의 버튼을 동작
-            t.draw_post_image()
+            event_result = event_handler()
+            if event_result:
+                break
 
         cv2.waitKey(1)
         if cv2.getWindowProperty(c.Project().NAME, cv2.WND_PROP_VISIBLE) < 1:
