@@ -38,10 +38,27 @@ def draw_pre_image(img):
 
 
 def draw_button(img):
-    # 색상 버튼, 지우개 버튼, 초기화 버튼, 변환 버튼, 종료 버튼
-    button = np.zeros((64, 256, 3), np.uint8)
-    cv2.rectangle(button, (00, 00), (256, 64), (255, 255, 255), 4)
-    draw_non_masked(img, button, 16, 16)
+    cb = c.Button()
+
+    # 색상 버튼
+    color_x = g.cam_w - (cb.COLOR_WIDTH + cb.COLOR_GAP + cb.ETC_WIDTH + cb.ETC_GAP)
+    color_y = 0 + cb.ETC_GAP
+    for i in range(len(cb.COLOR_VALUE)):
+        button = np.full((cb.COLOR_HEIGHT, cb.COLOR_WIDTH, 3), cb.COLOR_VALUE[i], np.uint8)
+        cv2.rectangle(button, (0, 0), (cb.COLOR_WIDTH, cb.COLOR_HEIGHT), (0, 0, 0), 4)
+        draw_non_masked(img, button, color_x, color_y + (i * (cb.COLOR_HEIGHT + cb.COLOR_GAP)))
+
+    # 기타 버튼(지우개, 초기화, 변환, 저장, 종료)
+    etc_x = g.cam_w - (cb.ETC_WIDTH + cb.ETC_GAP)
+    etc_y = 0 + cb.ETC_GAP
+    for i in range(len(cb.ETC_VALUE)):
+        button = np.full((cb.ETC_HEIGHT, cb.ETC_WIDTH, 3), (255, 255, 255), np.uint8)
+        cv2.rectangle(button, (0, 0), (cb.ETC_WIDTH, cb.ETC_HEIGHT), (0, 0, 0), 4)
+        text_size = cv2.getTextSize(cb.ETC_VALUE[i], cv2.FONT_HERSHEY_SIMPLEX, 0.8, 2)[0]
+        cv2.putText(button, cb.ETC_VALUE[i],
+                    ((cb.ETC_WIDTH - text_size[0]) // 2 + 4, (cb.ETC_HEIGHT + text_size[1]) // 2),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
+        draw_non_masked(img, button, etc_x, etc_y + (i * (cb.ETC_HEIGHT + cb.ETC_GAP)))
 
 
 def draw_pointer(img):
