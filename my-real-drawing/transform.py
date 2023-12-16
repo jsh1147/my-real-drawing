@@ -2,17 +2,17 @@ import cv2
 import base64
 import os
 import requests
+import pyautogui
+from dotenv import load_dotenv
 
+import constants as c
 import globals as g
 
 
-def draw_post_image():
-    cv2.rectangle(g.post_image, (0, 0), (g.cam_w, g.cam_h), (255, 255, 255), -1)
-
-
-def stable_diffusion():
+def stable_diffusion_api(image, description):
+    load_dotenv()
     api_key = os.getenv("STABILITY_API_KEY")
-    api_host = os.getenv("API_HOST", "https://api.stability.ai")
+    api_host = "https://api.stability.ai"
     engine_id = "stable-diffusion-xl-1024-v1-0"
 
     if api_key is None:
@@ -25,29 +25,42 @@ def stable_diffusion():
             "Authorization": f"Bearer {api_key}"
         },
         files={
-            # 사진 파일 열기
-            "init_image": open("baby1.png", "rb")
+            "init_image": image
         },
         data={
-            "image_strength": 0.35,
-            "init_image_mode": "IMAGE_STRENGTH",
-            # 프롬포트 작성
-            "text_prompts[0][text]": "In the style of a master artist, express it in a high quality artistic painting. And draw the background naturally to match the painting. If there is no background in the painting, color it in harmony with the painting",
-            # 가이던스 스케일 (cfg_scale): 프롬프트 텍스트에 얼마나 엄격하게 따를 것인지 정의합니다.
-            "cfg_scale": 35,
-            # 출력 이미지 수 (samples): 생성할 이미지의 수입니다.
-            "samples": 1,
-            # 스텝 수 (steps): 확산 과정에서 사용할 스텝의 수입니다.
-            "steps": 30,
+            "image_strength": 0.1,
+            "text_prompts[0][text]": f"{description}, (high_resolution:1.2), (distinct_image:1.2), extremely detailed CG, super detail, best illumination, High_Clarity, Intricate_Details, extremely detailed character, best Shadow",
+            "text_prompts[0][weight]": 1,
+            "text_prompts[1][text]": "(worst quality, low quality:1.4), (worst quality:1.2, low quality:1.2, bad anatomy:1.2, extra digit, fewer digit), text, error, signature, watermark, username, artist name, EasyNegative, (ugly, 3d realistic), (blurry:1.3), extra digit, extra arms, bad_prompt",
+            "text_prompts[1][weight]": -1,
+            "cfg_scale": 30,
+            "steps": 40,
         }
     )
 
     if response.status_code != 200:
         raise Exception("Non-200 response: " + str(response.text))
+    return response.json()
 
-    data = response.json()
+
+def transform_image():
+    cp = c.Project()
+    description = pyautogui.prompt("추가적인 설명이 필요합니다.\n예) A, B, C", cp.NAME)
+
+    transform_img = cv2.resize(g.pre_image, (1152, 896))
+    cv2.imwrite(cp.TRANS_PRE_URL, transform_img)
+
+    with open(cp.TRANS_PRE_URL, "rb") as image:
+        data = stable_diffusion_api(image, description)
 
     for i, image in enumerate(data["artifacts"]):
-        file_path = f"v1_img2img_{i}.png"
-        with open(file_path, "wb") as f:
+        with open(cp.TRANS_POST_URL, "wb") as f:
             f.write(base64.b64decode(image["base64"]))
+
+    transform_img = cv2.imread(cp.TRANS_POST_URL, cv2.IMREAD_COLOR)
+    transform_img = cv2.resize(transform_img, (g.cam_w, g.cam_h))
+    g.post_image = transform_img
+
+    os.remove(cp.TRANS_PRE_URL)
+    os.remove(cp.TRANS_POST_URL)
+    g.hand_state = c.State().MOVE
