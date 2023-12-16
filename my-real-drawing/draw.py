@@ -28,9 +28,10 @@ def draw_masked(base_img, added_img, x, y):
 
 def draw_dot():
     if g.prev_state == c.State().DRAW:
-        cv2.line(g.pre_image, (g.prev_x, g.prev_y), (g.hand_x, g.hand_y), g.color, 8)
+        cv2.line(g.pre_image, (g.prev_x, g.prev_y), (g.hand_x, g.hand_y), g.color, g.thick)
     else:
-        cv2.circle(g.pre_image, (g.hand_x+4, g.hand_y+4), 4, g.color, -1)
+        radius = g.thick // 2
+        cv2.circle(g.pre_image, (g.hand_x+radius, g.hand_y+radius), radius, g.color, -1)
 
 
 def draw_pre_image(img):
@@ -63,6 +64,8 @@ def draw_button(img):
 
 def draw_pointer(img):
     pointer = cv2.imread(f"./assets/{g.hand_state}.png", cv2.IMREAD_UNCHANGED)
+    mask = cv2.inRange(pointer, (255, 255, 255, 255), (255, 255, 255, 255))
+    pointer[mask == 255] = g.color
     draw_masked(img, pointer, g.hand_x, g.hand_y)
 
 

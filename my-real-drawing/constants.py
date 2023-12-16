@@ -29,7 +29,10 @@ class Pointer:
 class Project:
     @property
     def NAME(self): return 'My Real Drawing'
-
+    @property
+    def SAVE_PRE_URL(self): return './My Drawing.png'
+    @property
+    def SAVE_POST_URL(self): return './My Real Drawing.png'
 
 class State:
     @property

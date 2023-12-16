@@ -17,19 +17,21 @@ def event_handler():
     # 색상 버튼
     if etc_x - (cb.COLOR_WIDTH + cb.COLOR_GAP) <= pointer_x <= etc_x - cb.COLOR_GAP:
         g.color = cb.COLOR_VALUE[(pointer_y - cb.ETC_GAP) // (cb.COLOR_HEIGHT + cb.COLOR_GAP)] + (255,)
+        g.thick = 8
 
     # 기타 버튼(지우개, 초기화, 변환, 저장, 종료)
     elif etc_x <= pointer_x <= etc_x + cb.ETC_WIDTH:
         target = (pointer_y - cb.ETC_GAP) // (cb.ETC_HEIGHT + cb.ETC_GAP)
         if target == 0:  # 지우개
             g.color = (0, 0, 0) + (0,)
+            g.thick = 24
         elif target == 1:  # 초기화
             g.pre_image = np.zeros((g.cam_h, g.cam_w, 4), np.uint8)
         elif target == 2:  # 변환
             t.draw_post_image()
         elif target == 3:  # 저장
-            cv2.imwrite('./My_Drawing.png', g.pre_image)
-            cv2.imwrite('./My_Real_Drawing.png', g.post_image)
+            cv2.imwrite(c.Project().SAVE_PRE_URL, g.pre_image)
+            cv2.imwrite(c.Project().SAVE_POST_URL, g.post_image)
         elif target == 4:  # 종료
             return True
     return False
